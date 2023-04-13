@@ -3,6 +3,7 @@ import re
 import sys
 import time
 
+from .misc import Alignment
 from .slide import Slide, SlideBuilder
 
 
@@ -37,7 +38,7 @@ def clear() -> None:
     os.system("cls") if sys.platform == "win32" else os.system("clear")
 
 
-SLIDE_REGEX = r"\s*(\d+[.,]?\d*)?\s*(?:s|sec|seconds)?\s+```([r|l][d|u])\s*(-?\d+);(-?\d+);?(-?\d+)?\s([\S\s]*?)(?:\n)```(\+|-)?"
+SLIDE_REGEX = r"\s*(\d+[.,]?\d*)?\s*(?:s|sec|seconds)?\s+```([r|l][d|u])\s*([-~]?\d+|[lmrud]);([-~]?\d+|[lmrud]);?(-?\d+)?\s([\S\s]*?)(?:\n)```(\+|-)?"
 PLACEMENT_FUNCTIONS = {
     "lu": SlideBuilder.add_text_lu,
     "ld": SlideBuilder.add_text_ld,
@@ -67,6 +68,14 @@ class Presentation:
 
     @staticmethod
     def load_from_file(path: str) -> "Presentation":
+        def process_pos(pos: str):
+            if pos.startswith("~"):
+                return Alignment.from_tilde_string(pos)
+            elif pos in "lmrud":
+                return Alignment.from_direction_letter(pos)
+            else:
+                return int(pos)
+
         with open(path, "r", encoding="utf-8") as f:
             slide_list = []
             text = f.read()
@@ -78,13 +87,13 @@ class Presentation:
                 duration = 0
                 needs_confirmation = True
                 for index, match in enumerate(
-                    re.finditer(SLIDE_REGEX, slide, re.MULTILINE)
+                    re.finditer(SLIDE_REGEX, slide, re.MULTILINE | re.IGNORECASE)
                 ):
                     placement_func = PLACEMENT_FUNCTIONS[match.group(2)]
-                    pos = (int(match.group(3)), int(match.group(4)))
+                    pos = (process_pos(match.group(3)), process_pos(match.group(4)))
                     side_indentation_count = int(match.group(5) or 0)
                     text = match.group(6)
-                    transition = True if match.group(7) == "+" else False
+                    transition = match.group(7) == "+"
                     if index == 0:
                         duration = float(match.group(1) or 0)
                         needs_confirmation = duration == 0

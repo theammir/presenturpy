@@ -16,7 +16,9 @@ class Slide:
         self.needs_confirmaion = kwargs.get("needs_confirmaion", not self.duration)
 
     def __str__(self):
-        return f"<Slide {self.duration} seconds, {'needs' if self.needs_confirmaion else 'does not need'} confirmation>"
+        return f"<Slide: {len(self.text)} letters, {self.duration} seconds, {'needs' if self.needs_confirmaion else 'does not need'} confirmation>"
+
+    __repr__ = __str__
 
 
 class SlideBuilder:
@@ -36,6 +38,13 @@ class SlideBuilder:
         _transition_count: int = 0,
     ) -> "SlideBuilder":
         abs_pos = position
+        abs_pos = tuple(
+            self._termsize[index] + element
+            if element < 0 and element not in Alignment.__dict__.values()
+            else element
+            for index, element in enumerate(abs_pos)
+        )
+
         for index, line in enumerate(text.split("\n")):
             line = " " * side_indentation_count + line
             match position[0]:
@@ -90,26 +99,62 @@ class SlideBuilder:
     add_text = add_text_lu
 
     def add_text_ld(
-        self, text: str, position: tuple[int, int], transition: bool = False
-    ) -> "SlideBuilder":
-        return self._add_text(
-            text, (position[0], position[1] - (len(text.split("\n")) - 1)), transition
-        )
-
-    def add_text_ru(
-        self, text: str, position: tuple[int, int], transition: bool = False
-    ) -> "SlideBuilder":
-        return self._add_text(
-            text, (position[0] - (len(text) - 1), position[1]), transition
-        )
-
-    def add_text_rd(
-        self, text: str, position: tuple[int, int], transition: bool = False
+        self,
+        text: str,
+        position: tuple[int, int],
+        transition: bool = False,
+        side_indentation_count: int = 0,
     ) -> "SlideBuilder":
         return self._add_text(
             text,
-            (position[0] - (len(text) - 1), position[1] - (len(text.split("\n")) - 1)),
+            (
+                position[0],
+                position[1]
+                if position[1] < 0 and position[1] in Alignment.__dict__.values()
+                else position[1] - (len(text.split("\n")) - 1),
+            ),
             transition,
+            side_indentation_count=side_indentation_count,
+        )
+
+    def add_text_ru(
+        self,
+        text: str,
+        position: tuple[int, int],
+        transition: bool = False,
+        side_indentation_count: int = 0,
+    ) -> "SlideBuilder":
+        return self._add_text(
+            text,
+            (
+                position[0]
+                if position[0] < 0 and position[0] in Alignment.__dict__.values()
+                else position[0] - (len(text.split("\n")[0]) - 1),
+                position[1],
+            ),
+            transition,
+            side_indentation_count=side_indentation_count,
+        )
+
+    def add_text_rd(
+        self,
+        text: str,
+        position: tuple[int, int],
+        transition: bool = False,
+        side_indentation_count: int = 0,
+    ) -> "SlideBuilder":
+        return self._add_text(
+            text,
+            (
+                position[0]
+                if position[0] < 0 and position[0] in Alignment.__dict__.values()
+                else position[0] - (len(text.split("\n")[0]) - 1),
+                position[1]
+                if position[1] < 0 and position[1] in Alignment.__dict__.values()
+                else position[1] - (len(text.split("\n")) - 1),
+            ),
+            transition,
+            side_indentation_count=side_indentation_count,
         )
 
     @property

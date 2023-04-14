@@ -55,13 +55,16 @@ class Presentation:
         clear()
         for slide in self.slides:
             print(slide.text)
-
-            if slide.needs_confirmaion:
-                wait_key()
-                continue
-            elif slide.duration:
-                time.sleep(slide.duration)
-                continue
+            
+            try:
+                if slide.needs_confirmaion:
+                    wait_key()
+                    continue
+                elif slide.duration:
+                    time.sleep(slide.duration)
+                    continue
+            except KeyboardInterrupt:
+                return
 
         wait_key()
         clear()

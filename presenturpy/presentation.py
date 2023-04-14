@@ -2,14 +2,15 @@ import os
 import re
 import sys
 import time
+import typing
 
 from .misc import Alignment
 from .slide import Slide, SlideBuilder
 
 
-def wait_key():
+def wait_key() -> str:
     """Wait for a key press on the console and return it."""
-    result = None
+    result: str
     if os.name == "nt":
         import msvcrt
 
@@ -34,12 +35,12 @@ def wait_key():
     return result
 
 
-def clear() -> None:
-    os.system("cls") if sys.platform == "win32" else os.system("clear")
+def clear() -> int:
+    return os.system("cls") if sys.platform == "win32" else os.system("clear")
 
 
 SLIDE_REGEX = r"\s*(\d+[.,]?\d*)?\s*(?:s|sec|seconds)?\s+```([r|l][d|u])\s*([-~]?\d+|[lmrud]);([-~]?\d+|[lmrud]);?(-?\d+)?\s([\S\s]*?)(?:\n)```(\+|-)?"
-PLACEMENT_FUNCTIONS = {
+PLACEMENT_FUNCTIONS: dict[str, typing.Callable[..., SlideBuilder]] = {
     "lu": SlideBuilder.add_text_lu,
     "ld": SlideBuilder.add_text_ld,
     "ru": SlideBuilder.add_text_ru,
@@ -48,33 +49,31 @@ PLACEMENT_FUNCTIONS = {
 
 
 class Presentation:
-    def __init__(self, slides: list[Slide]):
+    def __init__(self, slides: list[Slide]) -> None:
         self.slides = slides
 
-    def show(self):
+    def show(self) -> None:
         clear()
         for slide in self.slides:
             print(slide.text)
-            
+
             try:
                 if slide.needs_confirmaion:
                     wait_key()
-                    continue
-                elif slide.duration:
+                if slide.duration:
                     time.sleep(slide.duration)
-                    continue
             except KeyboardInterrupt:
                 return
 
-        wait_key()
+        # wait_key()
         clear()
 
     @staticmethod
     def load_from_file(path: str) -> "Presentation":
-        def process_pos(pos: str):
+        def process_pos(pos: str) -> int:
             if pos.startswith("~"):
                 return Alignment.from_tilde_string(pos)
-            elif pos in "lmrud":
+            if pos in "lmrud":
                 return Alignment.from_direction_letter(pos)
             else:
                 return int(pos)
@@ -87,7 +86,7 @@ class Presentation:
             for slide in slide_text:
                 builder = SlideBuilder()
 
-                duration = 0
+                duration = 0.0
                 needs_confirmation = True
                 for index, match in enumerate(
                     re.finditer(SLIDE_REGEX, slide, re.MULTILINE | re.IGNORECASE)

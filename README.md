@@ -3,16 +3,20 @@
 [Файл презентації](https://github.com/TheAmmiR/presenturpy/blob/a4a9f5e572c785022a6b793e8b63e5325a46abe1/braille.pres)
 
 ## What is it?
+
 A library, coded in 24 hours or so for a school project. Allows to place text blocks in 2D coordinates and make individual slides out of them.
 No pip dependencies btw
 
 ## Why?
+
 Because check this out:
 ![image](https://github.com/TheAmmiR/presenturpy/blob/master/screenshots/screenshot1.png?raw=true)
 [terminal, default settings](https://github.com/Swordfish90/cool-retro-term)
 
 ## Usage
+
 Loading from file (file syntax ↡):
+
 ```py
 from presenturpy import Presentation
 
@@ -21,6 +25,7 @@ presentation.show()
 ```
 
 Direct usage:
+
 ```py
 from presenturpy import Alignment, Presentation, SlideBuilder
 
@@ -41,16 +46,16 @@ slides.append(
     .build()
 )
 
-# On the final slide with needs_confirmation=False, press any key once.
-# Else, press any key twice.
-# If the final slide has a set duration, the slide will be shown until the time runs out  (i guess?)
+# If the final slide has a set duration, the slide will be shown until the time runs out.
 
 presentation = Presentation(slides)
 presentation.show()
 ```
 
 ### File syntax
+
 Example file:
+
 ```fix
 [5[,0|.0] s|sec|seconds]        # Duration, needs confirmation if none
 
@@ -68,7 +73,11 @@ yeah                            # l|m|r for horizontal alignment, u|m|d for vert
 
 ```
 
-## To-do (maybe):
-    * Refactoring
-    * Renaming corners
-    * Easy slide duplication
+___
+
+## To-do (maybe)
+
+- [x] Refactoring (kinda)
+- [ ] Even more refactoring
+- [ ] Renaming corners
+- [ ] Easy slide duplication

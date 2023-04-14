@@ -10,23 +10,23 @@ class Alignment:
     """
 
     LEFT = 0
-    CENTRE = -667
-    MIDDLE = -667
+    CENTRE = MIDDLE = -667
     RIGHT = -668
 
     UP = 0
     TOP = -666
-    DOWN = -668
-    BOTTOM = -668
+    DOWN = BOTTOM = -668
 
     @staticmethod
-    def from_tilde_string(string: str):
-        return {"0": Alignment.LEFT, "1": Alignment.MIDDLE, "2": Alignment.RIGHT}[
-            string[1]
-        ]
+    def from_tilde_string(string: str) -> int:
+        return {
+            "0": Alignment.LEFT,
+            "1": Alignment.MIDDLE,
+            "2": Alignment.RIGHT
+        }[string[1]]
 
     @staticmethod
-    def from_direction_letter(string: str):
+    def from_direction_letter(string: str) -> int:
         return {
             "l": Alignment.LEFT,
             "m": Alignment.MIDDLE,

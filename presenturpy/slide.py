@@ -15,21 +15,24 @@ class Slide:
         self.duration = kwargs.get("duration")
         self.needs_confirmaion = kwargs.get("needs_confirmaion", not self.duration)
 
-    def __str__(self):
-        return f"<Slide: {len(self.text)} letters, {self.duration} seconds, {'needs' if self.needs_confirmaion else 'does not need'} confirmation>"
+    def __str__(self) -> str:
+        return (
+            f"<Slide: {len(self.text)} letters, {self.duration} seconds, "
+            "{'needs' if self.needs_confirmaion else 'does not need'} confirmation>"
+        )
 
     __repr__ = __str__
 
 
 class SlideBuilder:
-    def __init__(self):
+    def __init__(self) -> None:
         self._termsize = shutil.get_terminal_size()
 
         self.strings: list[str] = [" " * self._termsize[0]] * self._termsize[1]
         self.__duration: float = 3
         self.__needs_confirmaion: bool = False
 
-    def _add_text(
+    def add_text(
         self,
         text: str,
         position: tuple[int, int],
@@ -37,12 +40,11 @@ class SlideBuilder:
         side_indentation_count: int = 0,
         _transition_count: int = 0,
     ) -> "SlideBuilder":
-        abs_pos = position
         abs_pos = tuple(
             self._termsize[index] + element
             if element < 0 and element not in Alignment.__dict__.values()
             else element
-            for index, element in enumerate(abs_pos)
+            for index, element in enumerate(position)
         )
 
         for index, line in enumerate(text.split("\n")):
@@ -85,9 +87,9 @@ class SlideBuilder:
 
             self.strings[abs_pos[1] + index + _transition_count] = edited_line
             if transition:
-                self._add_text(
+                self.add_text(
                     line[len(line) - rest_len - side_indentation_count:],
-                    (position[0] if position[0] < 0 else 0, abs_pos[1] + index + 1),
+                    (min(position[0], 0), abs_pos[1] + index + 1),
                     transition,
                     _transition_count=_transition_count,
                 )
@@ -95,8 +97,7 @@ class SlideBuilder:
 
         return self
 
-    add_text_lu = _add_text
-    add_text = add_text_lu
+    add_text_lu = add_text
 
     def add_text_ld(
         self,
@@ -105,7 +106,7 @@ class SlideBuilder:
         transition: bool = False,
         side_indentation_count: int = 0,
     ) -> "SlideBuilder":
-        return self._add_text(
+        return self.add_text(
             text,
             (
                 position[0],
@@ -124,7 +125,7 @@ class SlideBuilder:
         transition: bool = False,
         side_indentation_count: int = 0,
     ) -> "SlideBuilder":
-        return self._add_text(
+        return self.add_text(
             text,
             (
                 position[0]
@@ -143,7 +144,7 @@ class SlideBuilder:
         transition: bool = False,
         side_indentation_count: int = 0,
     ) -> "SlideBuilder":
-        return self._add_text(
+        return self.add_text(
             text,
             (
                 position[0]
@@ -158,7 +159,7 @@ class SlideBuilder:
         )
 
     @property
-    def duration(self):
+    def duration(self) -> float:
         return self.__duration
 
     def set_duration(self, value: float) -> "SlideBuilder":
@@ -166,7 +167,7 @@ class SlideBuilder:
         return self
 
     @property
-    def needs_confirmaion(self):
+    def needs_confirmaion(self) -> bool:
         return self.__needs_confirmaion
 
     def set_confirmation(self, value: bool) -> "SlideBuilder":

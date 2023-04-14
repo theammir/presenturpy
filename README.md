@@ -7,7 +7,8 @@ A library, coded in 24 hours or so for a school project. Allows to place text bl
 No pip dependencies btw
 
 ## Why?
-Because check this out: (screenshot here)
+Because check this out:
+![image](https://github.com/TheAmmiR/presenturpy/blob/master/screenshots/screenshot1.png?raw=true)
 [terminal, default settings](https://github.com/Swordfish90/cool-retro-term)
 
 ## Usage
@@ -50,7 +51,7 @@ presentation.show()
 
 ### File syntax
 Example file:
-```py
+```fix
 [5[,0|.0] s|sec|seconds]        # Duration, needs confirmation if none
 
 ```lu m;10[;0]                  # Pivot corner (the one you write coordinates for) 
@@ -58,7 +59,7 @@ Example text                    # (lu|ld|ru|rd)
 Because I have to explain       # Side indentation - wraps every line in a number of spaces on each side
 a bunch of stuff here           # xpos;ypos - allows negative absolute values.
 yeah                            # l|m|r for horizontal alignment, u|m|d for vertical
-```+                            # `+` allows word wrapping if you don't mind having 1 letter of the word on the next line sometimes
+```+                            # + allows word wrapping if you don't mind having 1 letter of the word on the next line sometimes
                                 # If you do, try to adjust side indentation.
 
 ---                             # Slide delimiter

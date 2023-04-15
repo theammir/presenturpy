@@ -4,21 +4,21 @@ from .misc import Alignment
 
 
 class Slide:
-    def __init__(self, text: str, **kwargs) -> None:
+    def __init__(self, text: str, duration: float = None, needs_confirmation: bool = None) -> None:
         """
         Represents a single presentation slide.
 
         @param duration: float - duration of the slide in seconds.
-        @param needs_confirmaion: bool - requires a keypress to continue.
+        @param needs_confirmation: bool - requires a keypress to continue.
         """
         self.text = text
-        self.duration = kwargs.get("duration")
-        self.needs_confirmaion = kwargs.get("needs_confirmaion", not self.duration)
+        self.duration = duration
+        self.needs_confirmation = needs_confirmation if needs_confirmation is not None else not self.duration
 
     def __str__(self) -> str:
         return (
-            f"<Slide: {len(self.text)} letters, {self.duration} seconds, "
-            "{'needs' if self.needs_confirmaion else 'does not need'} confirmation>"
+            f"<Slide: {len(self.text)} letters, {self.duration} "
+            f"{'needs' if self.needs_confirmation else 'does not need'} confirmation>"
         )
 
     __repr__ = __str__
@@ -29,8 +29,41 @@ class SlideBuilder:
         self._termsize = shutil.get_terminal_size()
 
         self.strings: list[str] = [" " * self._termsize[0]] * self._termsize[1]
-        self.__duration: float = 3
-        self.__needs_confirmaion: bool = False
+        self._duration: float = 3
+        self._needs_confirmation: bool = False
+
+    def _get_abs_position(self, position: tuple[int, int], line: str, text: str) -> tuple[int, int]:
+        abs_pos = tuple(
+            self._termsize[index] + element
+            if element < 0 and element not in Alignment.__dict__.values()
+            else element
+            for index, element in enumerate(position)
+        )
+
+        match position[0]:
+            case Alignment.MIDDLE:
+                abs_pos = (
+                    max(0, self._termsize[0] // 2 - len(line) // 2),
+                    abs_pos[1],
+                )
+
+            case Alignment.RIGHT:
+                abs_pos = (max(0, self._termsize[0] - len(line)), abs_pos[1])
+
+        match position[1]:
+            case Alignment.MIDDLE:
+                abs_pos = (
+                    abs_pos[0],
+                    max(0, self._termsize[1] // 2 - len(text.split("\n")) // 2),
+                )
+
+            case Alignment.BOTTOM:
+                abs_pos = (
+                    abs_pos[0],
+                    max(0, self._termsize[1] - len(text.split("\n"))),
+                )
+
+        return abs_pos
 
     def add_text(
         self,
@@ -40,37 +73,9 @@ class SlideBuilder:
         side_indentation_count: int = 0,
         _transition_count: int = 0,
     ) -> "SlideBuilder":
-        abs_pos = tuple(
-            self._termsize[index] + element
-            if element < 0 and element not in Alignment.__dict__.values()
-            else element
-            for index, element in enumerate(position)
-        )
-
         for index, line in enumerate(text.split("\n")):
             line = " " * side_indentation_count + line
-            match position[0]:
-                case Alignment.MIDDLE:
-                    abs_pos = (
-                        max(0, self._termsize[0] // 2 - len(line) // 2),
-                        abs_pos[1],
-                    )
-
-                case Alignment.RIGHT:
-                    abs_pos = (max(0, self._termsize[0] - len(line)), abs_pos[1])
-
-            match position[1]:
-                case Alignment.MIDDLE:
-                    abs_pos = (
-                        abs_pos[0],
-                        max(0, self._termsize[1] // 2 - len(text.split("\n")) // 2),
-                    )
-
-                case Alignment.BOTTOM:
-                    abs_pos = (
-                        abs_pos[0],
-                        max(0, self._termsize[1] - len(text.split("\n"))),
-                    )
+            abs_pos = self._get_abs_position(position, line, text)
 
             if (abs_pos[1] + index + _transition_count) > (len(self.strings) - 1):
                 return self
@@ -160,23 +165,23 @@ class SlideBuilder:
 
     @property
     def duration(self) -> float:
-        return self.__duration
+        return self._duration
 
     def set_duration(self, value: float) -> "SlideBuilder":
-        self.__duration = value
+        self._duration = value
         return self
 
     @property
-    def needs_confirmaion(self) -> bool:
-        return self.__needs_confirmaion
+    def needs_confirmation(self) -> bool:
+        return self._needs_confirmation
 
     def set_confirmation(self, value: bool) -> "SlideBuilder":
-        self.__needs_confirmaion = value
+        self._needs_confirmation = value
         return self
 
     def build(self) -> Slide:
         return Slide(
             "\n".join(self.strings),
             duration=self.duration,
-            needs_confirmaion=self.needs_confirmaion,
+            needs_confirmation=self.needs_confirmation,
         )

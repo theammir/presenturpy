@@ -58,7 +58,7 @@ class Presentation:
             print(slide.text)
 
             try:
-                if slide.needs_confirmaion:
+                if slide.needs_confirmation:
                     wait_key()
                 if slide.duration:
                     time.sleep(slide.duration)

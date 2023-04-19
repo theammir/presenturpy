@@ -93,12 +93,12 @@ class Presentation:
                 ):
                     placement_func = PLACEMENT_FUNCTIONS[match.group(2)]
                     pos = (process_pos(match.group(3)), process_pos(match.group(4)))
-                    side_indentation_count = int(match.group(5) or 0)
+                    side_indentation = int(match.group(5) or 0)
                     text = match.group(6)
                     transition = match.group(7) == "+"
                     if index == 0:
                         duration = float(match.group(1) or 0)
-                        needs_confirmation = duration == 0
+                        needs_confirmation = (duration == 0)
 
                     builder = (
                         placement_func(
@@ -106,7 +106,7 @@ class Presentation:
                             text,
                             pos,
                             transition=transition,
-                            side_indentation_count=side_indentation_count,
+                            side_indentation_count=side_indentation,
                         )
                         .set_duration(duration)
                         .set_confirmation(needs_confirmation)

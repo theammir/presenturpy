@@ -78,6 +78,6 @@ ___
 ## To-do (maybe)
 
 - [x] Refactoring (kinda)
-- [ ] Even more refactoring
+- [x] Even more refactoring
 - [ ] Renaming corners
 - [ ] Easy slide duplication

@@ -4,7 +4,7 @@ from .misc import Alignment
 
 
 class Slide:
-    def __init__(self, text: str, duration: float = None, needs_confirmation: bool = None) -> None:
+    def __init__(self, text: str, duration: float = 3.0, needs_confirmation: bool | None = None) -> None:
         """
         Represents a single presentation slide.
 
@@ -28,7 +28,7 @@ class SlideBuilder:
     def __init__(self) -> None:
         self._termsize = shutil.get_terminal_size()
 
-        self.strings: list[str] = [" " * self._termsize[0]] * self._termsize[1]
+        self.screen_rows: list[str] = [" " * self._termsize[0]] * self._termsize[1]
         self._duration: float = 3
         self._needs_confirmation: bool = False
 
@@ -70,35 +70,35 @@ class SlideBuilder:
         text: str,
         position: tuple[int, int],
         transition: bool = False,
-        side_indentation_count: int = 0,
-        _transition_count: int = 0,
+        side_indentation: int = 0,
+        _transition_steps: int = 0,
     ) -> "SlideBuilder":
         for index, line in enumerate(text.split("\n")):
-            line = " " * side_indentation_count + line
+            line = " " * side_indentation + line
             abs_pos = self._get_abs_position(position, line, text)
 
-            if (abs_pos[1] + index + _transition_count) > (len(self.strings) - 1):
+            if (abs_pos[1] + index + _transition_steps) > (len(self.screen_rows) - 1):
                 return self
 
-            edited_line = self.strings[abs_pos[1] + index + _transition_count]
+            edited_row = self.screen_rows[abs_pos[1] + index + _transition_steps]
 
-            rest_len = -min(0, len(edited_line) - abs_pos[0] - len(line))
+            remaining_len = -min(0, len(edited_row) - abs_pos[0] - len(line))
 
-            edited_line = (
-                edited_line[: abs_pos[0]]
-                + line[: len(line) - rest_len - side_indentation_count]
-                + edited_line[abs_pos[0] + len(line):]
+            edited_row = (
+                edited_row[: abs_pos[0]]
+                + line[: len(line) - remaining_len - side_indentation]
+                + edited_row[abs_pos[0] + len(line):]
             )
 
-            self.strings[abs_pos[1] + index + _transition_count] = edited_line
+            self.screen_rows[abs_pos[1] + index + _transition_steps] = edited_row
             if transition:
                 self.add_text(
-                    line[len(line) - rest_len - side_indentation_count:],
+                    line[len(line) - remaining_len - side_indentation:],
                     (min(position[0], 0), abs_pos[1] + index + 1),
                     transition,
-                    _transition_count=_transition_count,
+                    _transition_steps=_transition_steps,
                 )
-                _transition_count += 1
+                _transition_steps += 1
 
         return self
 
@@ -120,7 +120,7 @@ class SlideBuilder:
                 else position[1] - (len(text.split("\n")) - 1),
             ),
             transition,
-            side_indentation_count=side_indentation_count,
+            side_indentation=side_indentation_count,
         )
 
     def add_text_ru(
@@ -139,7 +139,7 @@ class SlideBuilder:
                 position[1],
             ),
             transition,
-            side_indentation_count=side_indentation_count,
+            side_indentation=side_indentation_count,
         )
 
     def add_text_rd(
@@ -160,7 +160,7 @@ class SlideBuilder:
                 else position[1] - (len(text.split("\n")) - 1),
             ),
             transition,
-            side_indentation_count=side_indentation_count,
+            side_indentation=side_indentation_count,
         )
 
     @property
@@ -181,7 +181,7 @@ class SlideBuilder:
 
     def build(self) -> Slide:
         return Slide(
-            "\n".join(self.strings),
+            "\n".join(self.screen_rows),
             duration=self.duration,
             needs_confirmation=self.needs_confirmation,
         )

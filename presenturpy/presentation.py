@@ -106,7 +106,7 @@ class Presentation:
                             text,
                             pos,
                             transition=transition,
-                            side_indentation_count=side_indentation,
+                            side_indentation=side_indentation,
                         )
                         .set_duration(duration)
                         .set_confirmation(needs_confirmation)

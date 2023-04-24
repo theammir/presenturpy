@@ -109,7 +109,7 @@ class SlideBuilder:
         text: str,
         position: tuple[int, int],
         transition: bool = False,
-        side_indentation_count: int = 0,
+        side_indentation: int = 0,
     ) -> "SlideBuilder":
         return self.add_text(
             text,
@@ -120,7 +120,7 @@ class SlideBuilder:
                 else position[1] - (len(text.split("\n")) - 1),
             ),
             transition,
-            side_indentation=side_indentation_count,
+            side_indentation=side_indentation,
         )
 
     def add_text_ru(
@@ -128,7 +128,7 @@ class SlideBuilder:
         text: str,
         position: tuple[int, int],
         transition: bool = False,
-        side_indentation_count: int = 0,
+        side_indentation: int = 0,
     ) -> "SlideBuilder":
         return self.add_text(
             text,
@@ -139,7 +139,7 @@ class SlideBuilder:
                 position[1],
             ),
             transition,
-            side_indentation=side_indentation_count,
+            side_indentation=side_indentation,
         )
 
     def add_text_rd(
@@ -147,7 +147,7 @@ class SlideBuilder:
         text: str,
         position: tuple[int, int],
         transition: bool = False,
-        side_indentation_count: int = 0,
+        side_indentation: int = 0,
     ) -> "SlideBuilder":
         return self.add_text(
             text,
@@ -160,7 +160,7 @@ class SlideBuilder:
                 else position[1] - (len(text.split("\n")) - 1),
             ),
             transition,
-            side_indentation=side_indentation_count,
+            side_indentation=side_indentation,
         )
 
     @property
